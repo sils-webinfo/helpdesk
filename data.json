@@ -3,22 +3,22 @@
     "description" : "Maybe because I dropped it in the bathtub?",
     "from" : "gary@unc.edu",
     "time" : "2014-10-13T12:00:4",
-    "priority": "high",
-    "comments": "needs to be fixed before he goes to China next week"
+    "priority": 3,
+    "comments": [ "needs to be fixed before he goes to China next week" ]
   },
   "dig73h":
   { "title" : "Out of ink",
     "description" : "I printed Twitter and now my printer is out of ink",
     "from" : "paul@unc.edu",
-    "time" : "2014-10-12T23:08:20",
-    "priority": "normal"
+    "time" : "2014-10-12T07:08:20",
+    "priority": 2
   },
   "0f4uqv":
   { "title" : "Need to install Solitaire",
     "description" : "My new laptop doesn't have Solitaire on it and I really need it",
     "from" : "ryanshaw@unc.edu",
-    "time" : "2014-10-12T07:40:21",
-    "priority": "low",
-    "comments": "this is not very important"
+    "time" : "2014-10-12T23:40:21",
+    "priority": 1,
+    "comments": [ "this is not very important" ]
   }
 }

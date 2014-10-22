@@ -1,0 +1,40 @@
+<!doctype html>
+<link rel="alternate" type="application/json" href="{{ request.path }}.json">
+<title>{{ helprequest.title }}</title>
+<h1 class="title">{{ helprequest.title }}</h1>  
+<p class="description">{{ helprequest. description }}</p>
+<p class="from">{{ helprequest.from }}</p>
+<time>{{ helprequest.time }}</time>
+<form class="help-request-editor" method="patch">
+  <label>priority
+  <select name="priority">
+    {% for value, label in priorities %}
+    <option value="{{ value }}" {% if helprequest.priority == value %}selected{% endif %}>
+      {{ label }}
+    </option>
+    {% endfor %}
+    </select>
+  </label>
+  <br>
+  <label>comments<br>
+    <ul>
+      {% for comment in helprequest.comments %}
+      <li>{{ comment }}</li>
+      {% endfor %}
+    </ul>
+    <textarea name="comment"></textarea>
+  </label>
+  <br>
+  <input class="update" type="submit" value="update help request">
+  <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>    
+  <script>
+    var $form = $("form[class='help-request-editor']")
+    $form.find("input[class='update']").click(
+      function(event) {
+        event.preventDefault()
+        $.ajax({ type: "PATCH", data: $form.serialize() })
+      }
+    )
+  </script>
+</form>
+<a rel="collection" href="{{ url_for('helprequestlist') }}">all open help requests</a>
