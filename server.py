@@ -1,5 +1,5 @@
 from flask import Flask, request, render_template, make_response
-from flask.ext.restful import Api, Resource, reqparse
+from flask.ext.restful import Api, Resource, reqparse, abort
 
 import json
 import string
@@ -22,7 +22,7 @@ def generate_id(size=6, chars=string.ascii_lowercase + string.digits):
 def error_if_helprequest_not_found(helprequest_id):
     if helprequest_id not in helprequests:
         message = "Help request {} doesn't exist".format(helprequest_id)    
-        abort(404, message)
+        abort(404, message=message)
 
 def filter_and_sort_helprequests(q='', sort_by='time'):
     filter_function = lambda x: q.lower() in (
