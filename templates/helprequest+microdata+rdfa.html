@@ -7,6 +7,8 @@
 view data extracted from RDFa markup</a><br>
 <a href="http://getschema.org/microdataextractor?url={{ request.url }}&out=json">
 view data extracted from microdata markup</a>  
+<a href="{{ request.path }}.json">
+view data as JSON-LD</a>
 <h1 class="title" itemprop="name" property="name">{{ helprequest.title }}</h1>  
 <p class="description" itemprop="description" property="description">{{ helprequest. description }}</p>
 <p class="from" itemprop="creator" itemscope itemtype="http://schema.org/Person"
