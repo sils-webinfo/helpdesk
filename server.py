@@ -10,8 +10,8 @@ from datetime import datetime
 PRIORITIES = ( 'closed', 'low', 'normal', 'high' )
 
 # load help requests data from disk
-with open('data.json') as data:
-    helprequests = json.load(data)
+with open('data.jsonld') as data:
+    data = json.load(data)
 
 #
 # define some helper functions
@@ -20,20 +20,21 @@ def generate_id(size=6, chars=string.ascii_lowercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
 
 def error_if_helprequest_not_found(helprequest_id):
-    if helprequest_id not in helprequests:
+    if helprequest_id not in data["helprequests"]:
         message = "Help request {} doesn't exist".format(helprequest_id)    
         abort(404, message=message)
 
 def filter_and_sort_helprequests(q='', sort_by='time'):
     filter_function = lambda x: q.lower() in (
         x[1]['title'] + x[1]['description']).lower()
-    filtered_helprequests = filter(filter_function, helprequests.items())
+    filtered_helprequests = filter(filter_function,
+                                   data["helprequests"].items())
     key_function = lambda x: x[1][sort_by]
     return sorted(filtered_helprequests, key=key_function, reverse=True)
         
 def render_helprequest_as_html(helprequest):
     return render_template(
-        'helprequest.html',
+        'helprequest+microdata+rdfa.html',
         helprequest=helprequest,
         priorities=reversed(list(enumerate(PRIORITIES))))
     
@@ -83,11 +84,12 @@ class HelpRequest(Resource):
     def get(self, helprequest_id):
         error_if_helprequest_not_found(helprequest_id)
         return make_response(
-            render_helprequest_as_html(helprequests[helprequest_id]), 200)
+            render_helprequest_as_html(
+                data["helprequests"][helprequest_id]), 200)
 
     def patch(self, helprequest_id):
         error_if_helprequest_not_found(helprequest_id)
-        helprequest=helprequests[helprequest_id]
+        helprequest = data["helprequests"][helprequest_id]
         update = update_helprequest_parser.parse_args()
         helprequest['priority'] = update['priority']
         if len(update['comment'].strip()) > 0:
@@ -98,7 +100,9 @@ class HelpRequest(Resource):
 class HelpRequestAsJSON(Resource):
     def get(self, helprequest_id):
         error_if_helprequest_not_found(helprequest_id)
-        return helprequests[helprequest_id]
+        helprequest = data["helprequests"][helprequest_id]
+        helprequest["@context"] = data["@context"]
+        return helprequest
     
 class HelpRequestList(Resource):
     def get(self):
@@ -119,7 +123,7 @@ class HelpRequestList(Resource):
 
 class HelpRequestListAsJSON(Resource):
     def get(self):
-        return helprequests
+        return data
 
 #
 # assign URL paths to our resources
