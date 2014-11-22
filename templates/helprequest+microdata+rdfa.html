@@ -1,8 +1,12 @@
 <!doctype html>
 <link rel="alternate" type="application/json" href="{{ request.path }}.json">
 <title>{{ helprequest.title }}</title>
-<body itemscope itemtype="http://schema.org/CreativeWork"
-      vocab="http://schema.org/" typeof="CreativeWork">  
+<body itemscope itemtype="http://schema.org/CreativeWork/HelpRequest"
+                vocab="http://schema.org/" typeof="CreativeWork">
+<a href="http://www.w3.org/2012/pyRdfa/extract?uri=referer">
+view data extracted from RDFa markup</a><br>
+<a href="http://getschema.org/microdataextractor?url={{ request.url }}&out=json">
+view data extracted from microdata markup</a>  
 <h1 class="title" itemprop="name" property="name">{{ helprequest.title }}</h1>  
 <p class="description" itemprop="description" property="description">{{ helprequest. description }}</p>
 <p class="from" itemprop="creator" itemscope itemtype="http://schema.org/Person"
