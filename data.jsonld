@@ -1,0 +1,41 @@
+{ "@context":
+  { "helpdesk": "https://rawgit.com/sils-webinfo/helpdesk/master/vocab.ttl#",
+    "helprequests":
+    { "@id": "helpdesk:helprequests",
+      "@container": "@index"
+    },
+    "title": "http://schema.org/name",
+    "description": "http://schema.org/description",
+    "from": "http://schema.org/creator",
+    "time": "http://schema.org/dateCreated",
+    "comments": "http://schema.org/comment"
+  },
+  "helprequests":
+  { "fhs6jo" :
+    { "@type": "helpdesk:HelpRequest",
+      "title" : "Help my computer doesn't work",
+      "description" : "Maybe because I dropped it in the bathtub?",
+      "from" : "gary@unc.edu",
+      "time" : "2014-10-13T12:00:4",
+      "priority": 3,
+      "comments": [ "needs to be fixed before he goes to China next week" ]
+    },
+    "dig73h":
+    { "@type": "helpdesk:HelpRequest",
+      "title" : "Out of ink",
+      "description" : "I printed Twitter and now my printer is out of ink",
+      "from" : "paul@unc.edu",
+      "time" : "2014-10-12T07:08:20",
+      "priority": 2
+    },
+    "0f4uqv":
+    { "@type": "helpdesk:HelpRequest",
+      "title" : "Need to install Solitaire",
+      "description" : "My new laptop doesn't have Solitaire on it and I really need it",
+      "from" : "ryanshaw@unc.edu",
+      "time" : "2014-10-12T23:40:21",
+      "priority": 1,
+      "comments": [ "this is not very important" ]
+    }
+  }
+}

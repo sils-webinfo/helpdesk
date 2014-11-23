@@ -1,0 +1,47 @@
+<!doctype html>
+<link rel="alternate" type="application/json" href="{{ request.path }}.json">
+<title>{{ helprequest.title }}</title>
+<body itemscope itemtype="http://schema.org/CreativeWork">  
+<h1 class="title" itemprop="name">{{ helprequest.title }}</h1>  
+<p class="description" itemprop="description">{{ helprequest. description }}</p>
+<p class="from" itemprop="creator" itemscope itemtype="http://schema.org/Person">
+  <span itemprop="email">{{ helprequest.from }}</span>
+</p>
+<time itemprop="dateCreated">{{ helprequest.time }}</time>
+<form class="help-request-editor" method="patch">
+  <label>priority
+  <select name="priority">
+    {% for value, label in priorities %}
+    <option value="{{ value }}" {% if helprequest.priority == value %}selected{% endif %}>
+      {{ label }}
+    </option>
+    {% endfor %}
+    </select>
+  </label>
+  <br>
+  <label>comments<br>
+    <ul>
+      {% for comment in helprequest.comments %}
+      <li itemprop="comment" itemscope itemtype="http://schema.org/Comment">
+        <p itemprop="text">{{ comment }}</p>
+      </li>
+      {% endfor %}
+    </ul>
+    <textarea name="comment"></textarea>
+  </label>
+  <br>
+  <input class="update" type="submit" value="update help request">
+  <script>
+    var form = document.querySelector('form.help-request-editor');
+    var button = document.querySelector('form.help-request-editor input.update');
+
+    button.addEventListener('click', function (event) {
+      event.preventDefault();
+      var request = new XMLHttpRequest();
+      request.open('PATCH', window.location.pathname);
+      request.send(new FormData(form));
+    }, false);
+  </script>
+</form>
+<a rel="collection" href="{{ url_for('helprequestlist') }}">all open help requests</a>
+</body>
