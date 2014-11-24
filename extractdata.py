@@ -20,8 +20,8 @@ def show(url, in_format, out_format="turtle"):
             "http://schema.org/"))
         graph.bind("rdfa", rdflib.Namespace(
             "http://www.w3.org/ns/rdfa#"))
-        graph.bind("helpdesk", rdflib.Namespace(
-            "https://rawgit.com/sils-webinfo/helpdesk/master/vocab.ttl#"))
+        #graph.bind("helpdesk", rdflib.Namespace(
+        #    "https://rawgit.com/sils-webinfo/helpdesk/master/vocab.ttl#"))
         print(graph.serialize(format=out_format))
     else:
         print("\nNo structured data encoded as {}\n".format(in_format))
