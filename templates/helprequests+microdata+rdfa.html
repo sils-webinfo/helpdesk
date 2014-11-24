@@ -1,11 +1,13 @@
 <!doctype html>
 <link rel="alternate" type="application/json" href="{{ request.path }}.json">
 <title>All open help requests</title>
+
 {% if request.args["sort-by"] == "priority" %}
 <a href="{{ url_for('helprequestlist') }}?sort-by=time">sort by time</a>
 {% else %}
 <a href="{{ url_for('helprequestlist') }}?sort-by=priority">sort by priority</a>
 {% endif %}
+
 <form class="search" method="get">
   <input name="q" type="text" value="{{ request.args["q"] }}">
   {% if 'sort-by' in request.args %}
@@ -13,17 +15,30 @@
   {% endif %}
   <input class="query" type="submit" value="search">
 </form>
+
 <ol>
   {% for helprequest_id, helprequest in helprequests %}
-  <li>
-    <time>{{ helprequest.time }}</time>
+  <li itemscope
+      itemid="{{ url_for('helprequest', helprequest_id=helprequest_id, _external=True) }}"
+      resource="{{ url_for('helprequest', helprequest_id=helprequest_id, _external=True) }}"
+      vocab="http://schema.org/"
+      prefix="helpdesk:https://rawgit.com/sils-webinfo/helpdesk/master/vocab.ttl#"
+      property="helpdesk:helprequests"
+      typeof="helpdesk:HelpRequest">
+    <div itemprop="http://www.w3.org/ns/md#item"
+         itemscope itemtype="http://schema.org/CreativeWork/HelpRequest">
+    <time itemprop="dateCreated"
+          property="dateCreated"
+          datetime="{{ helprequest.time }}">{{ helprequest.time }}</time>
     priority: {{ priorities[helprequest.priority] }}
     <a rel="item" href="{{ url_for('helprequest', helprequest_id=helprequest_id) }}">
-      {{ helprequest.title }}
+      <span itemprop="name">{{ helprequest.title }}</span>
     </a>
+    </div>
   </li>
   {% endfor %}
 </ol>
+
 <form class="helprequest-editor" action="{{ url_for('helprequestlist') }}" method="post">
   <label>from
     <input name="from" type="text">

@@ -10,9 +10,11 @@
     "time": "http://schema.org/dateCreated",
     "comments": "http://schema.org/comment"
   },
+  "@id": "requests",
   "helprequests":
   { "fhs6jo" :
     { "@type": "helpdesk:HelpRequest",
+      "@id": "fhs6jo",
       "title" : "Help my computer doesn't work",
       "description" : "Maybe because I dropped it in the bathtub?",
       "from" : "gary@unc.edu",
@@ -22,6 +24,7 @@
     },
     "dig73h":
     { "@type": "helpdesk:HelpRequest",
+      "@id": "dig73h",
       "title" : "Out of ink",
       "description" : "I printed Twitter and now my printer is out of ink",
       "from" : "paul@unc.edu",
@@ -30,6 +33,7 @@
     },
     "0f4uqv":
     { "@type": "helpdesk:HelpRequest",
+      "@id": "0f4uqv",
       "title" : "Need to install Solitaire",
       "description" : "My new laptop doesn't have Solitaire on it and I really need it",
       "from" : "ryanshaw@unc.edu",

@@ -40,7 +40,7 @@ def render_helprequest_as_html(helprequest):
     
 def render_helprequest_list_as_html(helprequests):
     return render_template(
-        'helprequests.html',
+        'helprequests+microdata+rdfa.html',
         helprequests=helprequests,
         priorities=PRIORITIES)
 
