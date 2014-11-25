@@ -31,8 +31,8 @@
           property="dateCreated"
           datetime="{{ helprequest.time }}">{{ helprequest.time }}</time>
     priority: {{ priorities[helprequest.priority] }}
-    <a rel="item" href="{{ url_for('helprequest', helprequest_id=helprequest_id) }}">
-      <span itemprop="name">{{ helprequest.title }}</span>
+    <a href="{{ url_for('helprequest', helprequest_id=helprequest_id) }}">
+      <span itemprop="name" property="name">{{ helprequest.title }}</span>
     </a>
     </div>
   </li>
