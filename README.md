@@ -33,11 +33,11 @@ To run it:
    ```
    $ python extractdata.py http://aeshin.org:5555/requests.json
    ```
-   RDFa/microdata for an individual help requests:
+   RDFa/microdata for an individual help request:
    ```
    $ python extractdata.py http://aeshin.org:5555/request/fhs6jo
    ```
-   JSON-LD for an individual help requests:
+   JSON-LD for an individual help request:
    ```
    $ python extractdata.py http://aeshin.org:5555/request/fhs6jo.json
    ```
