@@ -24,7 +24,7 @@ To run it:
    ```
    Alternatively, you can access the service running here: http://aeshin.org:5555/requests
    
-3. Use the `extractdata.py` script to examine the triples found in various representations of the helpdesk resources:
+3. Use the `extractdata.py` script to examine the triples found in various representations of the helpdesk resources.
    
    RDFa/microdata for the list of help requests:
    ```
