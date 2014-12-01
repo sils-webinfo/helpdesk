@@ -21,7 +21,7 @@ def generate_id(size=6, chars=string.ascii_lowercase + string.digits):
 
 def error_if_helprequest_not_found(helprequest_id):
     if helprequest_id not in data["helprequests"]:
-        message = "Help request {} doesn't exist".format(helprequest_id)    
+        message = "Help request {} doesn't exist".format(helprequest_id)
         abort(404, message=message)
 
 def filter_and_sort_helprequests(q='', sort_by='time'):
@@ -31,13 +31,13 @@ def filter_and_sort_helprequests(q='', sort_by='time'):
                                    data["helprequests"].items())
     key_function = lambda x: x[1][sort_by]
     return sorted(filtered_helprequests, key=key_function, reverse=True)
-        
+
 def render_helprequest_as_html(helprequest):
     return render_template(
         'helprequest+microdata+rdfa.html',
         helprequest=helprequest,
         priorities=reversed(list(enumerate(PRIORITIES))))
-    
+
 def render_helprequest_list_as_html(helprequests):
     return render_template(
         'helprequests+microdata+rdfa.html',
@@ -76,7 +76,7 @@ query_parser.add_argument(
     'q', type=str, default='')
 query_parser.add_argument(
     'sort-by', type=str, choices=('priority', 'time'), default='time')
-        
+
 #
 # define our (kinds of) resources
 #
@@ -103,7 +103,7 @@ class HelpRequestAsJSON(Resource):
         helprequest = data["helprequests"][helprequest_id]
         helprequest["@context"] = data["@context"]
         return helprequest
-    
+
 class HelpRequestList(Resource):
     def get(self):
         query = query_parser.parse_args()
@@ -138,4 +138,3 @@ api.add_resource(HelpRequestAsJSON, '/request/<string:helprequest_id>.json')
 # start the server
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5555)
-

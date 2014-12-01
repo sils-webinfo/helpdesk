@@ -4,19 +4,14 @@ This is an example of a simple web API implemented using
 
 To run it:
 
-1. [Install Flask](http://flask.pocoo.org/docs/0.10/installation/#installation)
+1. Install required dependencies:
+   ```
+   $ pip install -r requirements.txt
+   ``` 
+   [Flask](http://flask.pocoo.org/docs/0.10/installation/#installation)
    and
-   [install Flask-RESTful](http://flask-restful.readthedocs.org/en/latest/installation.html).
-
-
-2. To run the `extractdata.py` script or the `another-server.py` service, you will need to additionally install [RDFLib](http://rdflib.readthedocs.org/en/latest/):
-   ```
-   $ pip install rdflib
-   ```
-   ... and the [JSON-LD plugin for RDFLib](https://github.com/RDFLib/rdflib-jsonld):
-   ```
-   $ pip install https://github.com/RDFLib/rdflib-jsonld/archive/master.zip
-   ```
+   [Flask-RESTful](http://flask-restful.readthedocs.org/en/latest/installation.html) to run `server.py` 
+   and [RDFLib](http://rdflib.readthedocs.org/en/latest/) and [JSONLD for RDFLib](https://github.com/RDFLib/rdflib-jsonld) to run the `extractdata.py` script or the `another-server.py` service.
 
 2. Run the helpdesk server:
    ```
