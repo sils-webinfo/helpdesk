@@ -40,7 +40,7 @@ def render_helprequest_as_html(helprequest):
 
 def render_helprequest_list_as_html(helprequests):
     return render_template(
-        'helprequests.html',
+        'helprequests+microdata+rdfa.html',
         helprequests=helprequests,
         priorities=PRIORITIES)
 
@@ -137,9 +137,13 @@ api.add_resource(HelpRequestAsJSON, '/request/<string:helprequest_id>.json')
 
 # start the server
 if __name__ == '__main__':
+<<<<<<< HEAD
 
 
 
     app.run(host='0.0.0.0', port=5000)
+
+
+
 
 
