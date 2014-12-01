@@ -1,0 +1,4 @@
+flask
+flask-restful
+rdflib
+http://github.com/RDFLib/rdflib-jsonld/archive/master.zip
