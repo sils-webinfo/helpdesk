@@ -1,14 +1,17 @@
 import rdflib
 import sys
-from urllib2 import urlopen
+from urllib.request import urlopen
+
 
 def is_html(representation):
     return representation.info().get(
         "content-type").startswith("text/html")
 
+
 def is_json(representation):
     return representation.info().get(
         "content-type").startswith("application/json")
+
 
 def show(url, in_format, out_format="turtle"):
     graph = rdflib.Graph()
@@ -20,9 +23,10 @@ def show(url, in_format, out_format="turtle"):
             "http://schema.org/"))
         graph.bind("rdfa", rdflib.Namespace(
             "http://www.w3.org/ns/rdfa#"))
-        print(graph.serialize(format=out_format))
+        print(graph.serialize(format=out_format).decode('utf-8'))
     else:
         print("\nNo structured data encoded as {}\n".format(in_format))
+
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
@@ -38,5 +42,3 @@ if __name__ == "__main__":
             show(url, "json-ld")
         else:
             print("No structured data found.")
-
-    
