@@ -1,7 +1,7 @@
 { "@context":
   { "helpdesk": "https://rawgit.com/sils-webinfo/helpdesk/master/vocab.ttl#",
     "helprequests":
-    { "@id": "helpdesk:helprequests",
+    { "@id": "http://www.w3.org/2000/01/rdf-schema#member",
       "@container": "@index"
     },
     "title": "http://schema.org/name",

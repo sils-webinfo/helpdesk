@@ -59,10 +59,16 @@ view data as JSON-LD</a>
       event.preventDefault();
       var request = new XMLHttpRequest();
       request.open('PATCH', window.location.pathname);
+      request.onreadystatechange = function () {
+        if (XMLHttpRequest.DONE === request.readyState 
+            && 200 === request.status) {
+          window.location.reload(true);
+        }
+      }
       request.send(new FormData(form));
     }, false);
   </script>
 </form>
 
-<a rel="collection" href="{{ url_for('helprequestlist') }}">all open help requests</a>
+<a rel="collection" href="{{ url_for('helprequestlist') }}">all help requests</a>
 </body>
