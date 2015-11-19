@@ -155,9 +155,12 @@ class HelpRequestList(Resource):
     # representation of the updated list.
     def post(self):
         helprequest = new_helprequest_parser.parse_args()
+        helprequest_id = generate_id()
+        helprequest['@id'] = 'request/' + helprequest_id
+        helprequest['@type'] = 'helpdesk:HelpRequest'
         helprequest['time'] = datetime.isoformat(datetime.now())
         helprequest['priority'] = PRIORITIES.index('normal')
-        data['helprequests'][generate_id()] = helprequest
+        data['helprequests'][helprequest_id] = helprequest
         return make_response(
             render_helprequest_list_as_html(
                 filter_and_sort_helprequests()), 201)
