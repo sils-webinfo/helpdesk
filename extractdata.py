@@ -1,6 +1,11 @@
 import rdflib
 import sys
-from urllib.request import urlopen
+try:
+    # python 2
+    from urllib import urlopen
+except:
+    # python 3
+    from urllib.request import urlopen
 
 
 def is_html(representation):
