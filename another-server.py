@@ -1,34 +1,35 @@
 from flask import Flask, redirect
 from flask.ext.restful import Api, Resource
 
-import rdflib
 from copy import deepcopy
 
-# contacts data
-data = [{"name": "Gary Marchionini",
-         "email": "gary@unc.edu"},
-        {"name": "Ryan Shaw",
-         "email": "ryanshaw@unc.edu"},
-        {"name": "Paul Jones",
-         "email": "paul@unc.edu"},
-        {"name": "Diane Kelly",
-         "email": "diane@unc.edu"}]
+from twitter import Twitter
+twitter = Twitter()
 
-schema = rdflib.Namespace("http://schema.org/")
+
+# contacts data
+data = [{'name': 'Gary Marchionini',
+         'email': 'gary@unc.edu',
+         'twitter': 'marchionini'},
+        {'name': 'Ryan Shaw',
+         'email': 'ryanshaw@unc.edu',
+         'twitter': 'rybesh'},
+        {'name': 'Paul Jones',
+         'email': 'paul@unc.edu',
+         'twitter': 'smalljones'},
+        {'name': 'Diane Kelly',
+         'email': 'diane@unc.edu'}]
 
 
 # Define our contacts list resource.
 class ContactListAsJSON(Resource):
     def get(self):
         contacts = deepcopy(data)
-        graph = rdflib.Graph()
-        graph.parse("http://aeshin.org:5555/requests.json", format="json-ld")
         for contact in contacts:
-            contact["requests"] = []
-            for s in graph.subjects(
-                    predicate=schema.creator,
-                    object=rdflib.Literal(contact["email"])):
-                contact["requests"].append(str(s))
+            if 'twitter' in contact:
+                tweets = twitter.search('from:%s' % contact['twitter'])
+                if len(tweets) > 0:
+                    contact['last_tweet'] = tweets[0]['text']
         return contacts
 
 
