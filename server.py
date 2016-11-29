@@ -198,6 +198,33 @@ class HelpRequestListAsJSON(Resource):
         return data
 
 
+class Greeting(Resource):
+    def get(self, role):
+        parser = reqparse.RequestParser()
+        parser.add_argument('name', type=str, default='Akira')
+        args = parser.parse_args()
+        print(args)
+        return make_response(
+            render_template('greeting.html', role=role, **args))
+
+roles = set()
+
+
+class Greetings(Resource):
+    def get(self):
+        return make_response(
+            render_template('greetings.html', roles=roles))
+
+    def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('role', type=str)
+        args = parser.parse_args()
+        print(args)
+        roles.add(args['role'])
+        return make_response(
+            render_template('greetings.html', roles=roles), 201)
+
+
 # Assign URL paths to our resources.
 app = Flask(__name__)
 api = Api(app)
@@ -205,6 +232,8 @@ api.add_resource(HelpRequestList, '/requests')
 api.add_resource(HelpRequestListAsJSON, '/requests.json')
 api.add_resource(HelpRequest, '/request/<string:helprequest_id>')
 api.add_resource(HelpRequestAsJSON, '/request/<string:helprequest_id>.json')
+api.add_resource(Greeting, '/greeting/<string:role>')
+api.add_resource(Greetings, '/greetings')
 
 
 # Redirect from the index to the list of help requests.
@@ -216,11 +245,11 @@ def index():
 # This is needed to load JSON from Javascript running in the browser.
 @app.after_request
 def after_request(response):
-  response.headers.add('Access-Control-Allow-Origin', '*')
-  response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
-  response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE')
-  return response
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE')
+    return response
 
 # Start the server.
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5555, debug=True)
+    app.run(host='0.0.0.0', port=8888, debug=True)
