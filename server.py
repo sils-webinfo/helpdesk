@@ -1,9 +1,11 @@
-from flask import Flask, render_template, make_response, redirect
+from flask import (Flask, Response, request, render_template, make_response,
+                   redirect)
 from flask.ext.restful import Api, Resource, reqparse, abort
 
 import json
 import string
 import random
+from functools import wraps
 from datetime import datetime
 
 # Define our priority levels.
@@ -14,6 +16,29 @@ PRIORITIES = ('closed', 'low', 'normal', 'high')
 # This simply loads the data from our "database," which is just a JSON file.
 with open('data.jsonld') as data:
     data = json.load(data)
+
+
+# Check that username and password are OK; DON'T DO THIS FOR REAL
+def check_auth(username, password):
+    return username == 'admin' and password == 'secret'
+
+
+# Issue an authentication challenge
+def authenticate():
+    return Response(
+        'Please authenticate yourself', 401,
+        {'WWW-Authenticate': 'Basic realm="helpdesk"'})
+
+
+# Decorator for methods that require authentication
+def requires_auth(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        auth = request.authorization
+        if not auth or not check_auth(auth.username, auth.password):
+            return authenticate()
+        return f(*args, **kwargs)
+    return decorated
 
 
 # Generate a unique ID for a new help request.
@@ -145,6 +170,7 @@ class HelpRequestList(Resource):
 
     # Respond with an HTML representation of the help request list, after
     # applying any filtering and sorting parameters.
+    @requires_auth
     def get(self):
         query = query_parser.parse_args()
         return make_response(
