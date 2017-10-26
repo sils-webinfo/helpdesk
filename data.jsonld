@@ -1,6 +1,6 @@
 { "@context":
   { "helpdesk": "https://rawgit.com/sils-webinfo/helpdesk/master/vocab.ttl#",
-    "helprequests":
+    "helptickets":
     { "@id": "http://www.w3.org/2000/01/rdf-schema#member",
       "@container": "@index"
     },
@@ -10,11 +10,11 @@
     "time": "http://schema.org/dateCreated",
     "comments": "http://schema.org/comment"
   },
-  "@id": "requests",
-  "helprequests":
+  "@id": "tickets",
+  "helptickets":
   { "fhs6jo" :
-    { "@type": "helpdesk:HelpRequest",
-      "@id": "request/fhs6jo",
+    { "@type": "helpdesk:HelpTicket",
+      "@id": "ticket/fhs6jo",
       "title" : "Help my computer doesn't work",
       "description" : "Maybe because I dropped it in the bathtub?",
       "from" : "gary@unc.edu",
@@ -23,8 +23,8 @@
       "comments": [ "needs to be fixed before he goes to China next week" ]
     },
     "dig73h":
-    { "@type": "helpdesk:HelpRequest",
-      "@id": "request/dig73h",
+    { "@type": "helpdesk:HelpTicket",
+      "@id": "ticket/dig73h",
       "title" : "Out of ink",
       "description" : "I printed Twitter and now my printer is out of ink",
       "from" : "paul@unc.edu",
@@ -32,8 +32,8 @@
       "priority": 2
     },
     "0f4uqv":
-    { "@type": "helpdesk:HelpRequest",
-      "@id": "request/0f4uqv",
+    { "@type": "helpdesk:HelpTicket",
+      "@id": "ticket/0f4uqv",
       "title" : "Need to install Solitaire",
       "description" : "My new laptop doesn't have Solitaire on it and I really need it",
       "from" : "ryanshaw@unc.edu",

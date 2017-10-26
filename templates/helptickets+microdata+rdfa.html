@@ -1,0 +1,54 @@
+<!doctype html>
+<link rel="alternate" type="application/json" href="{{ request.path }}.json">
+<title>All open help tickets</title>
+
+{% if request.args["sort_by"] == "priority" %}
+<a href="{{ url_for('helpticketlist') }}?sort_by=time">sort by time</a>
+{% else %}
+<a href="{{ url_for('helpticketlist') }}?sort_by=priority">sort by priority</a>
+{% endif %}
+
+<form class="search" method="get">
+  <input name="query" type="text" value="{{ request.args["query"] }}">
+  {% if 'sort_by' in request.args %}
+  <input name="sort_by" type="hidden" value="{{ request.args["sort_by"] }}">
+  {% endif %}
+  <input class="query" type="submit" value="search">
+</form>
+
+<ol>
+  {% for helpticket_id, helpticket in helptickets %}
+  <li itemscope
+      itemid="{{ url_for('helpticket', helpticket_id=helpticket_id, _external=True) }}"
+      resource="{{ url_for('helpticket', helpticket_id=helpticket_id, _external=True) }}"
+      vocab="http://schema.org/"
+      prefix="helpdesk: https://rawgit.com/sils-webinfo/helpdesk/master/vocab.ttl#"
+      property="helpdesk:helptickets"
+      typeof="helpdesk:HelpTicket">
+    <div itemprop="http://www.w3.org/ns/md#item"
+         itemscope itemtype="http://schema.org/CreativeWork/HelpTicket">
+    <time itemprop="dateCreated"
+          property="dateCreated"
+          datetime="{{ helpticket.time }}">{{ helpticket.time }}</time>
+    priority: {{ priorities[helpticket.priority] }}
+    <a href="{{ url_for('helpticket', helpticket_id=helpticket_id) }}">
+      <span itemprop="name" property="name">{{ helpticket.title }}</span>
+    </a>
+    </div>
+  </li>
+  {% endfor %}
+</ol>
+
+<form class="helpticket-editor" action="{{ url_for('helpticketlist') }}" method="post">
+  <label>from
+    <input name="from" type="text">
+  </label>
+  <br>
+  <label>title
+    <input name="title" type="text">
+  </label>
+  <br>
+  <textarea name="description"></textarea>
+  <br>  
+  <input class="create" type="submit" value="create new help ticket">
+</form>

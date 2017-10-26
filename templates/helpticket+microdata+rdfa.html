@@ -1,11 +1,11 @@
 <!doctype html>
 <link rel="alternate" type="application/json" href="{{ request.path }}.json">
-<title>{{ helprequest.title }}</title>
+<title>{{ helpticket.title }}</title>
 
-<body itemscope itemtype="http://schema.org/CreativeWork/HelpRequest"
+<body itemscope itemtype="http://schema.org/CreativeWork/HelpTicket"
                 vocab="http://schema.org/"
                 prefix="helpdesk:https://rawgit.com/sils-webinfo/helpdesk/master/vocab.ttl#"
-                typeof="helpdesk:HelpRequest">
+                typeof="helpdesk:HelpTicket">
 
 <a href="http://www.w3.org/2012/pyRdfa/extract?uri=referer">
 view data extracted from RDFa markup</a><br>
@@ -14,23 +14,23 @@ view data extracted from microdata markup</a><br>
 <a href="{{ request.path }}.json">
 view data as JSON-LD</a>
 
-<h1 class="title" itemprop="name" property="name">{{ helprequest.title }}</h1>  
+<h1 class="title" itemprop="name" property="name">{{ helpticket.title }}</h1>  
 
-<p class="description" itemprop="description" property="description">{{ helprequest. description }}</p>
+<p class="description" itemprop="description" property="description">{{ helpticket. description }}</p>
 
 <p class="from" itemprop="creator" itemscope itemtype="http://schema.org/Person"
    property="creator" typeof="Person">>
-  <span itemprop="email" property="email">{{ helprequest.from }}</span>
+  <span itemprop="email" property="email">{{ helpticket.from }}</span>
 </p>
 
 <time itemprop="dateCreated" property="dateCreated"
-      datetime="{{ helprequest.time }}">{{ helprequest.time }}</time>
+      datetime="{{ helpticket.time }}">{{ helpticket.time }}</time>
 
-<form class="help-request-editor" method="patch">
+<form class="helpticket-editor" method="patch">
   <label>priority
   <select name="priority">
     {% for value, label in priorities %}
-    <option value="{{ value }}" {% if helprequest.priority == value %}selected{% endif %}>
+    <option value="{{ value }}" {% if helpticket.priority == value %}selected{% endif %}>
       {{ label }}
     </option>
     {% endfor %}
@@ -40,7 +40,7 @@ view data as JSON-LD</a>
 
   <label>comments<br>
     <ul>
-      {% for comment in helprequest.comments %}
+      {% for comment in helpticket.comments %}
       <li itemprop="comment" itemscope itemtype="http://schema.org/Comment"
           property="comment" typeof="Comment">
         <p itemprop="text" property="text">{{ comment }}</p>
@@ -50,10 +50,10 @@ view data as JSON-LD</a>
     <textarea name="comment"></textarea>
   </label>
   <br>
-  <input class="update" type="submit" value="update help request">
+  <input class="update" type="submit" value="update help ticket">
   <script>
-    var form = document.querySelector('form.help-request-editor');
-    var button = document.querySelector('form.help-request-editor input.update');
+    var form = document.querySelector('form.helpticket-editor');
+    var button = document.querySelector('form.helpticket-editor input.update');
 
     button.addEventListener('click', function (event) {
       event.preventDefault();
@@ -70,5 +70,5 @@ view data as JSON-LD</a>
   </script>
 </form>
 
-<a rel="collection" href="{{ url_for('helprequestlist') }}">all help requests</a>
+<a rel="collection" href="{{ url_for('helpticketlist') }}">all help tickets</a>
 </body>

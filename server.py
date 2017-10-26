@@ -1,15 +1,40 @@
+# First we import parts of the frameworks we're using:
+#
+# Flask <http://flask.pocoo.org> is a simple framework for building web
+# applications in Python. It handles basic things like parsing incoming
+# HTTP requests and generating responses.
+#
+# Flask-RESTful <https://flask-restful.readthedocs.io/> is an add-on to Flask
+# that makes it easier to build web applications that adhere to the REST
+# architectural style.
+
 from flask import (Flask, Response, request, render_template, make_response,
                    redirect)
-from flask.ext.restful import Api, Resource, reqparse, abort
+from flask_restful import Api, Resource, reqparse, abort
+
+# Next we import some standard Python libraries and functions:
+#
+# json <https://docs.python.org/3/library/json.html> for loading a JSON file
+# from disk (our "database") into memory.
+#
+# random <https://docs.python.org/3/library/random.html> and string
+# <https://docs.python.org/3/library/string.html> to help us generate
+# unique IDs for help tickets from lowercase letters and digits.
+#
+# datetime <https://docs.python.org/3/library/datetime.html> to help us
+# generate timestamps for help tickets.
+#
+# wraps <https://docs.python.org/3/library/functools.html#functools.wraps>
+# is just a convenience function that will help us implement authentication.
 
 import json
-import string
 import random
-from functools import wraps
+import string
 from datetime import datetime
+from functools import wraps
 
-# Define our priority levels.
-# These are the values that the "priority" property can take on a help request.
+# Define some constants for our priority levels.
+# These are the values that the "priority" property can take on a help ticket.
 PRIORITIES = ('closed', 'low', 'normal', 'high')
 
 # Load data from disk.
@@ -17,6 +42,8 @@ PRIORITIES = ('closed', 'low', 'normal', 'high')
 with open('data.jsonld') as data:
     data = json.load(data)
 
+
+# The next three functions implement simple authentication.
 
 # Check that username and password are OK; DON'T DO THIS FOR REAL
 def check_auth(username, password):
@@ -41,59 +68,56 @@ def requires_auth(f):
     return decorated
 
 
-# Generate a unique ID for a new help request.
+# The following are three  helper functions used in our resource classes.
+
+# Generate a unique ID for a new help ticket.
 # By default this will consist of six lowercase numbers and letters.
 def generate_id(size=6, chars=string.ascii_lowercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
 
 
-# Respond with 404 Not Found if no help request with the specified ID exists.
-def error_if_helprequest_not_found(helprequest_id):
-    if helprequest_id not in data['helprequests']:
-        message = "No help request with ID: {}".format(helprequest_id)
+# Respond with 404 Not Found if no help ticket with the specified ID exists.
+def error_if_helpticket_not_found(helpticket_id):
+    if helpticket_id not in data['helptickets']:
+        message = "No help ticket with ID: {}".format(helpticket_id)
         abort(404, message=message)
 
 
-# Filter and sort a list of helprequests.
-def filter_and_sort_helprequests(query='', sort_by='time'):
+# Filter and sort a list of helptickets.
+def filter_and_sort_helptickets(query='', sort_by='time'):
 
-    # Returns True if the query string appears in the help request's
+    # Returns True if the query string appears in the help ticket's
     # title or description.
     def matches_query(item):
-        (helprequest_id, helprequest) = item
-        text = helprequest['title'] + helprequest['description']
+        (helpticket_id, helpticket) = item
+        text = helpticket['title'] + helpticket['description']
         return query.lower() in text
 
-    # Returns the help request's value for the sort property (which by
+    # Returns the help ticket's value for the sort property (which by
     # default is the "time" property).
     def get_sort_value(item):
-        (helprequest_id, helprequest) = item
-        return helprequest[sort_by]
+        (helpticket_id, helpticket) = item
+        return helpticket[sort_by]
 
-    filtered_helprequests = filter(matches_query, data['helprequests'].items())
+    filtered_helptickets = filter(matches_query, data['helptickets'].items())
 
-    return sorted(filtered_helprequests, key=get_sort_value, reverse=True)
-
-
-# Given the data for a help request, generate an HTML representation
-# of that help request.
-def render_helprequest_as_html(helprequest):
-    return render_template(
-        'helprequest+microdata+rdfa.html',
-        helprequest=helprequest,
-        priorities=reversed(list(enumerate(PRIORITIES))))
+    return sorted(filtered_helptickets, key=get_sort_value, reverse=True)
 
 
-# Given the data for a list of help requests, generate an HTML representation
-# of that list.
-def render_helprequest_list_as_html(helprequests):
-    return render_template(
-        'helprequests+microdata+rdfa.html',
-        helprequests=helprequests,
-        priorities=PRIORITIES)
+# Now we define three incoming HTTP request parsers using the Flask-RESTful
+# framework <https://flask-restful.readthedocs.io/en/latest/reqparse.html>.
+#
+# The first (new_helpticket_parser) parses incoming POST requests and checks
+# that they have the required values.
+#
+# The second (update_helpticket_parser) parses incoming PATCH requests and
+# checks that they have the required values.
+#
+# The third (query_parser) parses incoming GET requests to get the parameters
+# for sorting and filtering the list of help tickets.
 
-
-# Raises an error if the string x is empty (has zero length).
+# Helper function new_helpticket_parser. Raises an error if the string x
+# is empty (has zero length).
 def nonempty_string(x):
     s = str(x)
     if len(x) == 0:
@@ -101,26 +125,26 @@ def nonempty_string(x):
     return s
 
 
-# Specify the data necessary to create a new help request.
+# Specify the data necessary to create a new help ticket.
 # "from", "title", and "description" are all required values.
-new_helprequest_parser = reqparse.RequestParser()
+new_helpticket_parser = reqparse.RequestParser()
 for arg in ['from', 'title', 'description']:
-    new_helprequest_parser.add_argument(
+    new_helpticket_parser.add_argument(
         arg, type=nonempty_string, required=True,
         help="'{}' is a required value".format(arg))
 
 
-# Specify the data necessary to update an existing help request.
+# Specify the data necessary to update an existing help ticket.
 # Only the priority and comments can be updated.
-update_helprequest_parser = reqparse.RequestParser()
-update_helprequest_parser.add_argument(
+update_helpticket_parser = reqparse.RequestParser()
+update_helpticket_parser.add_argument(
     'priority', type=int, default=PRIORITIES.index('normal'))
-update_helprequest_parser.add_argument(
+update_helpticket_parser.add_argument(
     'comment', type=str, default='')
 
 
-# Specify the parameters for filtering and sorting help requests.
-# See `filter_and_sort_helprequests` above.
+# Specify the parameters for filtering and sorting help tickets.
+# See `filter_and_sort_helptickets` above.
 query_parser = reqparse.RequestParser()
 query_parser.add_argument(
     'query', type=str, default='')
@@ -128,128 +152,138 @@ query_parser.add_argument(
     'sort_by', type=str, choices=('priority', 'time'), default='time')
 
 
-# Define our help request resource.
-class HelpRequest(Resource):
+# Then we define a couple of helper functions for inserting data into HTML
+# templates (found in the templates/ directory). See
+# <http://flask.pocoo.org/docs/latest/quickstart/#rendering-templates>.
 
-    # If a help request with the specified ID does not exist,
+# Given the data for a help ticket, generate an HTML representation
+# of that help ticket.
+def render_helpticket_as_html(helpticket):
+    return render_template(
+        'helpticket+microdata+rdfa.html',
+        helpticket=helpticket,
+        priorities=reversed(list(enumerate(PRIORITIES))))
+
+
+# Given the data for a list of help tickets, generate an HTML representation
+# of that list.
+def render_helpticket_list_as_html(helptickets):
+    return render_template(
+        'helptickets+microdata+rdfa.html',
+        helptickets=helptickets,
+        priorities=PRIORITIES)
+
+
+# Now we can start defining our resource classes. We define four classes:
+# HelpTicket, HelpTicketAsJSON, HelpTicketList, and HelpTicketListAsJSON.
+# All of them accept GET requests. HelpTicket also accepts PATCH requests,
+# and HelpTicketList also accepts POST requests.
+
+# Define our help ticket resource.
+class HelpTicket(Resource):
+
+    # If a help ticket with the specified ID does not exist,
     # respond with a 404, otherwise respond with an HTML representation.
-    def get(self, helprequest_id):
-        error_if_helprequest_not_found(helprequest_id)
+    def get(self, helpticket_id):
+        error_if_helpticket_not_found(helpticket_id)
         return make_response(
-            render_helprequest_as_html(
-                data['helprequests'][helprequest_id]), 200)
+            render_helpticket_as_html(
+                data['helptickets'][helpticket_id]), 200)
 
-    # If a help request with the specified ID does not exist,
-    # respond with a 404, otherwise update the help request and respond
+    # If a help ticket with the specified ID does not exist,
+    # respond with a 404, otherwise update the help ticket and respond
     # with the updated HTML representation.
-    def patch(self, helprequest_id):
-        error_if_helprequest_not_found(helprequest_id)
-        helprequest = data['helprequests'][helprequest_id]
-        update = update_helprequest_parser.parse_args()
-        helprequest['priority'] = update['priority']
+    def patch(self, helpticket_id):
+        error_if_helpticket_not_found(helpticket_id)
+        helpticket = data['helptickets'][helpticket_id]
+        update = update_helpticket_parser.parse_args()
+        helpticket['priority'] = update['priority']
         if len(update['comment'].strip()) > 0:
-            helprequest.setdefault('comments', []).append(update['comment'])
+            helpticket.setdefault('comments', []).append(update['comment'])
         return make_response(
-            render_helprequest_as_html(helprequest), 200)
+            render_helpticket_as_html(helpticket), 200)
 
 
-# Define a resource for getting a JSON representation of a help request.
-class HelpRequestAsJSON(Resource):
+# Define a resource for getting a JSON representation of a help ticket.
+class HelpTicketAsJSON(Resource):
 
-    # If a help request with the specified ID does not exist,
+    # If a help ticket with the specified ID does not exist,
     # respond with a 404, otherwise respond with a JSON representation.
-    def get(self, helprequest_id):
-        error_if_helprequest_not_found(helprequest_id)
-        helprequest = data['helprequests'][helprequest_id]
-        helprequest['@context'] = data['@context']
-        return helprequest
+    def get(self, helpticket_id):
+        error_if_helpticket_not_found(helpticket_id)
+        helpticket = data['helptickets'][helpticket_id]
+        helpticket['@context'] = data['@context']
+        return helpticket
 
 
-# Define our help request list resource.
-class HelpRequestList(Resource):
+# Define our help ticket list resource.
+class HelpTicketList(Resource):
 
-    # Respond with an HTML representation of the help request list, after
+    # Respond with an HTML representation of the help ticket list, after
     # applying any filtering and sorting parameters.
-    @requires_auth
     def get(self):
         query = query_parser.parse_args()
         return make_response(
-            render_helprequest_list_as_html(
-                filter_and_sort_helprequests(**query)), 200)
+            render_helpticket_list_as_html(
+                filter_and_sort_helptickets(**query)), 200)
 
-    # Add a new help request to the list, and respond with an HTML
+    # Add a new help ticket to the list, and respond with an HTML
     # representation of the updated list.
     def post(self):
-        helprequest = new_helprequest_parser.parse_args()
-        helprequest_id = generate_id()
-        helprequest['@id'] = 'request/' + helprequest_id
-        helprequest['@type'] = 'helpdesk:HelpRequest'
-        helprequest['time'] = datetime.isoformat(datetime.now())
-        helprequest['priority'] = PRIORITIES.index('normal')
-        data['helprequests'][helprequest_id] = helprequest
+        helpticket = new_helpticket_parser.parse_args()
+        helpticket_id = generate_id()
+        helpticket['@id'] = 'request/' + helpticket_id
+        helpticket['@type'] = 'helpdesk:HelpTicket'
+        helpticket['time'] = datetime.isoformat(datetime.now())
+        helpticket['priority'] = PRIORITIES.index('normal')
+        data['helptickets'][helpticket_id] = helpticket
         return make_response(
-            render_helprequest_list_as_html(
-                filter_and_sort_helprequests()), 201)
+            render_helpticket_list_as_html(
+                filter_and_sort_helptickets()), 201)
 
 
-# Define a resource for getting a JSON representation of the help request list.
-class HelpRequestListAsJSON(Resource):
+# Define a resource for getting a JSON representation of the help ticket list.
+class HelpTicketListAsJSON(Resource):
     def get(self):
         return data
 
 
-class Greeting(Resource):
-    def get(self, role):
-        parser = reqparse.RequestParser()
-        parser.add_argument('name', type=str, default='Akira')
-        args = parser.parse_args()
-        print(args)
-        return make_response(
-            render_template('greeting.html', role=role, **args))
+# After defining our resource classes, we define how URLs are assigned to
+# resources by mapping resource classes to URL patterns.
 
-roles = set()
-
-
-class Greetings(Resource):
-    def get(self):
-        return make_response(
-            render_template('greetings.html', roles=roles))
-
-    def post(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('role', type=str)
-        args = parser.parse_args()
-        print(args)
-        roles.add(args['role'])
-        return make_response(
-            render_template('greetings.html', roles=roles), 201)
-
-
-# Assign URL paths to our resources.
 app = Flask(__name__)
 api = Api(app)
-api.add_resource(HelpRequestList, '/requests')
-api.add_resource(HelpRequestListAsJSON, '/requests.json')
-api.add_resource(HelpRequest, '/request/<string:helprequest_id>')
-api.add_resource(HelpRequestAsJSON, '/request/<string:helprequest_id>.json')
-api.add_resource(Greeting, '/greeting/<string:role>')
-api.add_resource(Greetings, '/greetings')
+api.add_resource(HelpTicketList, '/tickets')
+api.add_resource(HelpTicketListAsJSON, '/tickets.json')
+api.add_resource(HelpTicket, '/ticket/<string:helpticket_id>')
+api.add_resource(HelpTicketAsJSON, '/ticket/<string:helpticket_id>.json')
 
 
-# Redirect from the index to the list of help requests.
+# There is no resource mapped to the root path (/), so if a request comes in
+# for that, redirect to the HelpTicketList resource.
+
 @app.route('/')
 def index():
-    return redirect(api.url_for(HelpRequestList), code=303)
+    return redirect(api.url_for(HelpTicketList), code=303)
 
 
-# This is needed to load JSON from Javascript running in the browser.
+# Finally we add some headers to all of our HTTP responses which will allow
+# JavaScript loaded from other domains and running in the browser to load
+# representations of our resources (for security reasons, this is disabled
+# by default.
+
 @app.after_request
 def after_request(response):
-    response.headers.add('Access-Control-Allow-Origin', '*')
-    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
-    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE')
+    response.headers.add(
+        'Access-Control-Allow-Origin', '*')
+    response.headers.add(
+        'Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    response.headers.add(
+        'Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE')
     return response
 
-# Start the server.
+
+# Now we can start the server.
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8888, debug=True)
+    app.run(host='0.0.0.0', port=5555, debug=True)
