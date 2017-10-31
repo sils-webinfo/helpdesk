@@ -1,12 +1,17 @@
 <!doctype html>
+
+<!-- outbound link to ticket resource as JSON -->
 <link rel="alternate" type="application/json" href="{{ request.path }}.json">
+
 <title>{{ helpticket.title }}</title>
 
+<!-- start ticket information with embedded metadata -->
 <body itemscope itemtype="http://schema.org/CreativeWork/HelpTicket"
                 vocab="http://schema.org/"
                 prefix="helpdesk:https://rawgit.com/sils-webinfo/helpdesk/master/vocab.ttl#"
                 typeof="helpdesk:HelpTicket">
 
+<!-- outbound links to view metadata -->
 <a href="http://www.w3.org/2012/pyRdfa/extract?uri=referer">
 view data extracted from RDFa markup</a><br>
 <a href="http://getschema.org/microdataextractor?url={{ request.url }}&out=json">
@@ -26,6 +31,7 @@ view data as JSON-LD</a>
 <time itemprop="dateCreated" property="dateCreated"
       datetime="{{ helpticket.time }}">{{ helpticket.time }}</time>
 
+<!-- non-idempotent update link for updating this ticket -->
 <form class="helpticket-editor" method="patch">
   <label>priority
   <select name="priority">
@@ -51,6 +57,8 @@ view data as JSON-LD</a>
   </label>
   <br>
   <input class="update" type="submit" value="update help ticket">
+
+  <!-- embedded JavaScript for submitting PATCH instead of POST -->
   <script>
     var form = document.querySelector('form.helpticket-editor');
     var button = document.querySelector('form.helpticket-editor input.update');
@@ -69,6 +77,8 @@ view data as JSON-LD</a>
     }, false);
   </script>
 </form>
+<!-- end ticket information with embedded metadata -->
 
+<!-- outbound link to list of tickets -->
 <a rel="collection" href="{{ url_for('helpticketlist') }}">all help tickets</a>
 </body>
